@@ -5,8 +5,10 @@ tilemap = {}
 function tilemap:load()
     self.texture = love.graphics.newImage("res/image/tileset.png")
     self.tiles = {}
+    self.collision_rects = {}
 
     local tile_source = json.decode(love.filesystem.read("res/tilemap/tilemap.json"))
+    local collision_rect = nil
 
     for i = 1, #tile_source do
         local tile_number = tile_source[i]
@@ -38,13 +40,39 @@ function tilemap:load()
             end
             x = x + (tile_number * 72)
 
+            if collision_rect == nil then
+                collision_rect = {
+                    x = x,
+                    y = y,
+                    width = 72,
+                    height = 72,
+                    aabb_info = {
+                        overlap_x = 0,
+                        overlap_y = 0,
+                        previous_overlap_x = 0,
+                        previous_overlap_y = 0
+                    }
+                }
+            else
+                collision_rect.width = collision_rect.width + 72
+            end
+
             table.insert(self.tiles, {
-                rectangle = { x = x, y = y, width = 72, height = 72 },
+                rect = { x = x, y = y, width = 72, height = 72 },
                 quad = love.graphics.newQuad(x_offset, y_offset, 72, 72, self.texture:getWidth(),
-                    self.texture:getHeight())
+                    self.texture:getHeight()),
             })
+        else
+            if collision_rect ~= nil then
+                table.insert(self.collision_rects, collision_rect)
+                collision_rect = nil
+            end
         end
     end
+
+    table.remove(self.collision_rects, #self.collision_rects)
+    local last_collision_rect = self.collision_rects[#self.collision_rects]
+    last_collision_rect.height = last_collision_rect.height + 72
 end
 
 function tilemap:update(dt)
@@ -53,7 +81,13 @@ end
 function tilemap:draw()
     for i = 1, #self.tiles do
         local tile = self.tiles[i];
-        love.graphics.draw(self.texture, tile.quad, tile.rectangle.x, tile.rectangle.y);
-        love.graphics.rectangle("line", tile.rectangle.x, tile.rectangle.y, tile.rectangle.width, tile.rectangle.height)
+        love.graphics.draw(self.texture, tile.quad, tile.rect.x, tile.rect.y);
+    end
+
+    for i = 1, #self.collision_rects do
+        love.graphics.setColor(0, 1, 0, 1)
+        love.graphics.rectangle("line", self.collision_rects[i].x, self.collision_rects[i].y,
+            self.collision_rects[i].width, self.collision_rects[i].height)
+        love.graphics.setColor(1, 1, 1, 1)
     end
 end

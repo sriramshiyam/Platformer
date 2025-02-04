@@ -16,13 +16,13 @@ function player:load()
     self.scale = 4.5
     self.origin = { x = self.frame_width / 2, y = self.frame_height / 2 }
     self.position = { x = 100, y = 100 }
-    self.outline_width = self.frame_width * 0.8
-    self.outline_height = self.frame_height
-    self.outline_rect = {
-        x = self.position.x - (self.outline_width * self.scale * 0.8 / 2),
-        y = self.position.y - (self.outline_height * self.scale / 2),
-        width = self.outline_width * 0.8 * self.scale,
-        height = self.outline_height * self.scale
+    self.outline_width = self.frame_width * 0.8 * self.scale
+    self.outline_height = self.frame_height * self.scale
+    self.collision_rect = {
+        x = self.position.x - (self.outline_width * 0.8 / 2),
+        y = self.position.y - (self.outline_height / 2),
+        width = self.outline_width * 0.75,
+        height = self.outline_height
     }
     self.speed = 800
 end
@@ -57,8 +57,8 @@ function player:handle_input(dt)
         self.position.y = self.position.y - self.speed * dt
     end
 
-    self.outline_rect.x = self.position.x - (self.outline_width * self.scale * 0.8 / 2)
-    self.outline_rect.y = self.position.y - (self.outline_height * self.scale / 2)
+    self.collision_rect.x = self.position.x - (self.collision_rect.width / 2)
+    self.collision_rect.y = self.position.y - (self.collision_rect.height / 2)
 end
 
 function player:update_animation(dt)
@@ -100,6 +100,8 @@ end
 function player:draw()
     love.graphics.draw(self.current_texture, self.frame_quad, self.position.x, self.position.y, 0,
         (self.facing_direction == "right" and 1 or -1) * self.scale, self.scale, self.origin.x, self.origin.y)
-    love.graphics.rectangle("line", self.outline_rect.x, self.outline_rect.y, self.outline_rect.width,
-        self.outline_rect.height)
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.rectangle("line", self.collision_rect.x, self.collision_rect.y, self.collision_rect.width,
+        self.collision_rect.height)
+    love.graphics.setColor(1, 1, 1, 1)
 end

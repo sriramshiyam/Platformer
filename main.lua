@@ -1,6 +1,7 @@
 require "sprites.background"
 require "sprites.player"
 require "utils.tilemap"
+require "utils.collision"
 
 virtual_height = 1080
 virtual_width = 1872
@@ -34,6 +35,12 @@ end
 
 function love.update(dt)
     player:update(dt)
+    for i = 1, #tilemap.collision_rects do
+        if collides(player.collision_rect, tilemap.collision_rects[i]) then
+            player.position.x = player.collision_rect.x + (player.collision_rect.width / 2)
+            player.position.y = player.collision_rect.y + (player.collision_rect.height / 2)
+        end
+    end
 end
 
 function love.draw()
@@ -43,6 +50,16 @@ function love.draw()
     background:draw()
     tilemap:draw()
     player:draw()
+    print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()
+end
+
+function print_memory_usage()
+    local luaMemory = collectgarbage("count") / 1024
+    local stats = love.graphics.getStats()
+    local textureMemory = stats.texturememory / 1024 / 1024
+
+    love.graphics.print(string.format("RAM Memory: %.2f MB", luaMemory), 10, 10)
+    love.graphics.print(string.format("GPU Memory: %.2f MB", textureMemory), 10, 30)
 end
