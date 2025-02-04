@@ -35,10 +35,14 @@ end
 
 function love.update(dt)
     player:update(dt)
+    player.collides = false
     for i = 1, #tilemap.collision_rects do
+        tilemap.collision_rects[i].collides = false
         if collides(player.collision_rect, tilemap.collision_rects[i]) then
             player.position.x = player.collision_rect.x + (player.collision_rect.width / 2)
             player.position.y = player.collision_rect.y + (player.collision_rect.height / 2)
+            player.collides = true
+            tilemap.collision_rects[i].collides = true
         end
     end
 end

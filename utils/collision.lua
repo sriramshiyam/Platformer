@@ -23,7 +23,18 @@ function collides(player_rect, object_rect)
             player_rect.x = player_rect.x + ((center1.x < center2.x and -aabb_info.overlap_x) or aabb_info.overlap_x)
         elseif aabb_info.previous_overlap_x > 0 then
             player_rect.y = player_rect.y + ((center1.y < center2.y and -aabb_info.overlap_y) or aabb_info.overlap_y)
+            if center1.y < center2.y then
+                if player.y_velocity > 0 then
+                    player.in_air = false
+                    player.y_velocity = 0
+                    player.can_animate = true
+                end
+            else
+                player.y_velocity = 0
+                player.can_animate = true
+            end
         else
+            player.y_velocity = 0
             player_rect.x = player_rect.x + ((center1.x < center2.x and -aabb_info.overlap_x) or aabb_info.overlap_x)
             player_rect.y = player_rect.y + ((center1.y < center2.y and -aabb_info.overlap_y) or aabb_info.overlap_y)
         end

@@ -46,6 +46,7 @@ function tilemap:load()
                     y = y,
                     width = 72,
                     height = 72,
+                    collides = false,
                     aabb_info = {
                         overlap_x = 0,
                         overlap_y = 0,
@@ -84,10 +85,14 @@ function tilemap:draw()
         love.graphics.draw(self.texture, tile.quad, tile.rect.x, tile.rect.y);
     end
 
-    for i = 1, #self.collision_rects do
-        love.graphics.setColor(0, 1, 0, 1)
-        love.graphics.rectangle("line", self.collision_rects[i].x, self.collision_rects[i].y,
-            self.collision_rects[i].width, self.collision_rects[i].height)
-        love.graphics.setColor(1, 1, 1, 1)
-    end
+    -- for i = 1, #self.collision_rects do
+    --     if self.collision_rects[i].collides then
+    --         love.graphics.setColor(1, 0, 0, 1)
+    --     else
+    --         love.graphics.setColor(0, 1, 0, 1)
+    --     end
+    --     love.graphics.rectangle("line", self.collision_rects[i].x, self.collision_rects[i].y,
+    --         self.collision_rects[i].width, self.collision_rects[i].height)
+    --     love.graphics.setColor(1, 1, 1, 1)
+    -- end
 end
