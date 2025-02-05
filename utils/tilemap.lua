@@ -7,7 +7,7 @@ function tilemap:load()
     self.tiles = {}
     self.collision_rects = {}
 
-    local tile_source = json.decode(love.filesystem.read("res/tilemap/tilemap.json"))
+    local tile_source = json.decode(love.filesystem.read("res/json/tilemap.json"))
     local collision_rect = nil
 
     for i = 1, #tile_source do

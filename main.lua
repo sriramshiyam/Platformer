@@ -1,4 +1,5 @@
 require "sprites.background"
+require "sprites.decorations"
 require "sprites.player"
 require "utils.tilemap"
 require "utils.collision"
@@ -18,7 +19,6 @@ function draw_canvas()
 
     canvasOffsetX = (windowWidth - virtual_width * scale) / 2
     canvasOffsetY = (windowHeight - virtual_height * scale) / 2
-
     love.graphics.draw(canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
 end
 
@@ -29,6 +29,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
     background:load()
+    decorations:load()
     player:load()
     tilemap:load()
 end
@@ -40,7 +41,11 @@ function love.update(dt)
         tilemap.collision_rects[i].collides = false
         if collides(player.collision_rect, tilemap.collision_rects[i]) then
             player.position.x = player.collision_rect.x + (player.collision_rect.width / 2)
-            player.position.y = player.collision_rect.y + (player.collision_rect.height / 2)
+            if player.state == "crouching" then
+                player.position.y = player.collision_rect.y + (player.collision_rect.height * 0.3)
+            else
+                player.position.y = player.collision_rect.y + (player.collision_rect.height / 2)
+            end
             player.collides = true
             tilemap.collision_rects[i].collides = true
         end
@@ -53,6 +58,7 @@ function love.draw()
     love.graphics.clear(0, 0, 0, 1)
     background:draw()
     tilemap:draw()
+    decorations:draw()
     player:draw()
     print_memory_usage()
     love.graphics.setCanvas()
