@@ -2,10 +2,20 @@ decorations = {}
 
 function decorations:load()
     self.decs = {}
-    self.lamp_texture = love.graphics.newImage("res/image/lamp.png")
-    self.rock1_texture = love.graphics.newImage("res/image/rock_1.png")
-    self.rock2_texture = love.graphics.newImage("res/image/rock_2.png")
-    self.rock3_texture = love.graphics.newImage("res/image/rock_3.png")
+
+    self.textures = {
+        lamp = love.graphics.newImage("res/image/lamp.png"),
+        rock1 = love.graphics.newImage("res/image/rock_1.png"),
+        rock2 = love.graphics.newImage("res/image/rock_2.png"),
+        rock3 = love.graphics.newImage("res/image/rock_3.png"),
+        sign = love.graphics.newImage("res/image/sign.png"),
+        grass1 = love.graphics.newImage("res/image/grass_1.png"),
+        grass2 = love.graphics.newImage("res/image/grass_2.png"),
+        grass3 = love.graphics.newImage("res/image/grass_3.png"),
+        pumpkin = love.graphics.newImage("res/image/fireball.png")
+    }
+
+    self.textures.lampx = self.textures.lamp
     local dec_source = json.decode(love.filesystem.read("res/json/decorations.json"))
 
     for i = 1, #dec_source do
@@ -22,57 +32,34 @@ function decorations:load()
             end
             x = x + (tile_number * 72)
 
+            local dec_texture = self.textures[dec]
+            local scale
+
             if dec == "lampx" then
-                table.insert(self.decs,
-                    {
-                        tex_type = "lampx",
-                        position = {
-                            x = x + self.lamp_texture:getWidth() * 2.5 + 50,
-                            y = y - self.lamp_texture:getHeight() * 2.5
-                        },
-                        scale = 2.5
-                    })
-            elseif dec == "lamp" then
-                table.insert(self.decs,
-                    {
-                        tex_type = "lamp",
-                        position = {
-                            x = x + 50,
-                            y = y - self.lamp_texture:getHeight() * 2.5
-                        },
-                        scale = 2.5
-                    })
-            elseif dec == "rock1" then
-                table.insert(self.decs,
-                    {
-                        tex_type = "rock1",
-                        position = {
-                            x = x + 50,
-                            y = y - self.rock1_texture:getHeight() * 2.5
-                        },
-                        scale = 2.5
-                    })
-            elseif dec == "rock2" then
-                table.insert(self.decs,
-                    {
-                        tex_type = "rock2",
-                        position = {
-                            x = x + 50,
-                            y = y - self.rock2_texture:getHeight() * 2.5
-                        },
-                        scale = 2.5
-                    })
-            elseif dec == "rock3" then
-                table.insert(self.decs,
-                    {
-                        tex_type = "rock3",
-                        position = {
-                            x = x + 50,
-                            y = y - self.rock3_texture:getHeight() * 2.5
-                        },
-                        scale = 2.5
-                    })
+                x = x + dec_texture:getWidth() * 2.5 + 50
+                y = y - dec_texture:getHeight() * 2.5
+                scale = 2.5
+            elseif dec == "pumpkin" then
+                x = x + 50
+                y = y - dec_texture:getHeight() * 2.5
+                scale = 2.5
+            elseif string.find(dec, "grass") then
+                x = x + 50
+                y = y - dec_texture:getHeight() * 4.5
+                scale = 4.5
+            else
+                x = x + 50
+                y = y - dec_texture:getHeight() * 2.5
+                scale = 2.5
             end
+
+            table.insert(self.decs,
+                {
+                    tex_type = dec,
+                    position = { x = x, y = y },
+                    scale = scale,
+                    texture = dec_texture
+                })
         end
     end
 end
@@ -81,15 +68,9 @@ function decorations:draw()
     for i = 1, #self.decs do
         local dec = self.decs[i]
         if dec.tex_type == "lampx" then
-            love.graphics.draw(self.lamp_texture, dec.position.x, dec.position.y, 0, -dec.scale, dec.scale)
-        elseif dec.tex_type == "lamp" then
-            love.graphics.draw(self.lamp_texture, dec.position.x, dec.position.y, 0, dec.scale)
-        elseif dec.tex_type == "rock1" then
-            love.graphics.draw(self.rock1_texture, dec.position.x, dec.position.y, 0, dec.scale)
-        elseif dec.tex_type == "rock2" then
-            love.graphics.draw(self.rock2_texture, dec.position.x, dec.position.y, 0, dec.scale)
-        elseif dec.tex_type == "rock3" then
-            love.graphics.draw(self.rock3_texture, dec.position.x, dec.position.y, 0, dec.scale)
+            love.graphics.draw(dec.texture, dec.position.x, dec.position.y, 0, -dec.scale, dec.scale)
+        else
+            love.graphics.draw(dec.texture, dec.position.x, dec.position.y, 0, dec.scale)
         end
     end
 end

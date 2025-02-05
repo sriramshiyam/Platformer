@@ -22,9 +22,9 @@ function player:load()
     self.outline_width = self.frame_width * 0.8 * self.scale
     self.outline_height = self.frame_height * self.scale
     self.collision_rect = {
-        x = self.position.x - (self.outline_width * 0.75 / 2),
+        x = self.position.x - (self.outline_width * 0.65 / 2),
         y = self.position.y - (self.outline_height / 2),
-        width = self.outline_width * 0.75,
+        width = self.outline_width * 0.65,
         height = self.outline_height
     }
     self.collides = false
@@ -163,12 +163,12 @@ end
 function player:draw()
     love.graphics.draw(self.current_texture, self.frame_quad, self.position.x, self.position.y, 0,
         (self.facing_direction == "right" and 1 or -1) * self.scale, self.scale, self.origin.x, self.origin.y)
-    if self.collides then
-        love.graphics.setColor(1, 0, 0, 1)
-    else
-        love.graphics.setColor(0, 1, 0, 1)
-    end
-    love.graphics.rectangle("line", self.collision_rect.x, self.collision_rect.y, self.collision_rect.width,
-        self.collision_rect.height)
-    love.graphics.setColor(1, 1, 1, 1)
+    -- if self.collides then
+    --     love.graphics.setColor(1, 0, 0, 1)
+    -- else
+    --     love.graphics.setColor(0, 1, 0, 1)
+    -- end
+    -- love.graphics.rectangle("line", self.collision_rect.x, self.collision_rect.y, self.collision_rect.width,
+    --     self.collision_rect.height)
+    -- love.graphics.setColor(1, 1, 1, 1)
 end

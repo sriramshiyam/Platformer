@@ -1,3 +1,4 @@
+require "utils.music"
 require "sprites.background"
 require "sprites.decorations"
 require "sprites.player"
@@ -28,6 +29,7 @@ function love.load()
     love.window.maximize()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
+    music:load()
     background:load()
     decorations:load()
     player:load()
