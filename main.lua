@@ -3,6 +3,7 @@ require "sprites.background"
 require "sprites.glow"
 require "sprites.decorations"
 require "sprites.player"
+require "sprites.fireballs"
 require "utils.tilemap"
 require "utils.collision"
 
@@ -36,11 +37,15 @@ function love.load()
     player:load()
     tilemap:load()
     glow:load()
+    fireballs:load()
     glow.decoration_positions = decorations:get_pumpkin_positions()
 end
 
 function love.update(dt)
+    glow:update(dt)
     player:update(dt)
+    fireballs:update(dt)
+    glow.fireball_positions = fireballs:get_fireball_positions()
     player.collides = false
     for i = 1, #tilemap.collision_rects do
         tilemap.collision_rects[i].collides = false
@@ -66,7 +71,8 @@ function love.draw()
     tilemap:draw()
     decorations:draw()
     player:draw()
-    glow:draw_in_game()
+    fireballs:draw()
+    glow:draw()
     print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()
