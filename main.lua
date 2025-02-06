@@ -1,5 +1,6 @@
 require "utils.music"
 require "sprites.background"
+require "sprites.glow"
 require "sprites.decorations"
 require "sprites.player"
 require "utils.tilemap"
@@ -34,6 +35,8 @@ function love.load()
     decorations:load()
     player:load()
     tilemap:load()
+    glow:load()
+    glow.decoration_positions = decorations:get_pumpkin_positions()
 end
 
 function love.update(dt)
@@ -55,6 +58,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    glow:draw()
     love.graphics.clear()
     love.graphics.setCanvas(canvas)
     love.graphics.clear(0, 0, 0, 1)
@@ -62,6 +66,7 @@ function love.draw()
     tilemap:draw()
     decorations:draw()
     player:draw()
+    glow:draw_in_game()
     print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()

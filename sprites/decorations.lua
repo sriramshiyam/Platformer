@@ -1,3 +1,5 @@
+require "sprites.glow"
+
 decorations = {}
 
 function decorations:load()
@@ -73,4 +75,18 @@ function decorations:draw()
             love.graphics.draw(dec.texture, dec.position.x, dec.position.y, 0, dec.scale)
         end
     end
+end
+
+function decorations:get_pumpkin_positions()
+    local pumpkin_positions = {}
+    for i = 1, #self.decs do
+        local dec = self.decs[i]
+        if dec.tex_type == "pumpkin" then
+            table.insert(pumpkin_positions, {
+                x = dec.position.x + (dec.texture:getWidth() * dec.scale) / 2,
+                y = dec.position.y + (dec.texture:getHeight() * dec.scale) / 2
+            })
+        end
+    end
+    return pumpkin_positions
 end
