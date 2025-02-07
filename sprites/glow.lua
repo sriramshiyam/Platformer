@@ -10,7 +10,7 @@ function glow:load()
 end
 
 function glow:update(dt)
-    self.time = self.time + dt
+    self.time = self.time + 1.5 * dt
     self.shader:send("time", self.time)
 end
 
