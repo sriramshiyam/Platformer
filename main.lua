@@ -1,4 +1,5 @@
 require "utils.music"
+require "utils.sound"
 require "sprites.background"
 require "sprites.glow"
 require "sprites.decorations"
@@ -31,6 +32,7 @@ function love.load()
     love.window.maximize()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
+    sound:load()
     music:load()
     background:load()
     decorations:load()
@@ -45,12 +47,16 @@ function love.update(dt)
     glow:update(dt)
     player:update(dt)
     fireballs:update(dt)
+
     glow.fireball_positions = fireballs:get_fireball_positions()
+
     player.collides = false
+
     for i = 1, #tilemap.collision_rects do
         tilemap.collision_rects[i].collides = false
-        if collides(player.collision_rect, tilemap.collision_rects[i]) then
+        if collides(player.collision_rect, tilemap.collision_rects[i], "tile") then
             player.position.x = player.collision_rect.x + (player.collision_rect.width / 2)
+            player.attacked_velocity = 0.0
             if player.state == "crouching" then
                 player.position.y = player.collision_rect.y + (player.collision_rect.height * 0.3)
             else
@@ -58,6 +64,19 @@ function love.update(dt)
             end
             player.collides = true
             tilemap.collision_rects[i].collides = true
+        end
+    end
+
+    if player.attacked_velocity == 0.0 then
+        for i = 1, #fireballs.list do
+            local fireball = fireballs.list[i]
+            if distance(player.collision_rect.x, player.collision_rect.y, fireball.collision_rect.x, fireball.collision_rect.y) < 200 and collides(player.collision_rect, fireball.collision_rect, "fireball") then
+                sound.attacked:play()
+                player.attacked_direction = (fireball.velocity > 0 and 1) or -1
+                player.attacked_velocity = 500 * player.attacked_direction
+                player.attacked = true
+                player.y_velocity = -player.jump_velocity
+            end
         end
     end
 end

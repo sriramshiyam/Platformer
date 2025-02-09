@@ -1,5 +1,3 @@
-require "sprites.glow"
-
 decorations = {}
 
 function decorations:load()

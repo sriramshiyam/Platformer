@@ -22,7 +22,7 @@ function player:load()
     self.outline_width = self.frame_width * 0.8 * self.scale
     self.outline_height = self.frame_height * self.scale
     self.collision_rect = {
-        x = self.position.x - (self.outline_width * 0.65 / 2),
+        x = self.position.x - (self.outline_width * 0.5 / 2),
         y = self.position.y - (self.outline_height / 2),
         width = self.outline_width * 0.65,
         height = self.outline_height
@@ -34,9 +34,21 @@ function player:load()
     self.jump_velocity = 1250
     self.in_air = false
     self.can_animate = true
+    self.attacked = false
+    self.attacked_color_count = 0
+    self.attacked_radian_value = 0.0
+    self.can_increase_attacked_color_count = true
+    local shader_src = love.filesystem.read("res/shaders/attacked.glsl")
+    self.attacked_shader = love.graphics.newShader(shader_src)
+    self.attacked_velocity = 0.0
+    self.attacked_direction = 0
 end
 
 function player:update(dt)
+    if self.attacked then
+        self:handle_attacked_state(dt)
+    end
+
     if not self.collides and self.y_velocity > 0 then
         self.in_air = true
     end
@@ -49,12 +61,28 @@ function player:update(dt)
         self:change_animation()
     end
 
+    if self.attacked_velocity ~= 0.0 then
+        self.position.x = self.position.x + self.attacked_velocity * dt
+        if self.attacked_velocity > 0.0 then
+            self.attacked_velocity = self.attacked_velocity - 500 * dt
+            if self.attacked_velocity < 0.0 then
+                self.attacked_velocity = 0.0
+            end
+        else
+            self.attacked_velocity = self.attacked_velocity + 500 * dt
+            if self.attacked_velocity > 0.0 then
+                self.attacked_velocity = 0.0
+            end
+        end
+    end
+
     self:handle_input(dt)
     self:update_animation(dt)
 end
 
 function player:handle_input(dt)
     if love.keyboard.isDown("s") and not self.in_air and self.state ~= "crouching" then
+        sound.player_crouch:play()
         self.state = "crouching"
         self.collision_rect.height = self.collision_rect.height * 0.7
         self:change_animation()
@@ -68,6 +96,7 @@ function player:handle_input(dt)
 
     if self.state ~= "crouching" then
         if love.keyboard.isDown("w") and not self.in_air then
+            sound.player_jump:play()
             self.y_velocity = -self.jump_velocity
             self.in_air = true
             self.state = "jumping"
@@ -86,12 +115,14 @@ function player:handle_input(dt)
             end
         end
 
-        if love.keyboard.isDown("d") then
-            self.facing_direction = "right"
-            self.position.x = self.position.x + self.speed * dt
-        elseif love.keyboard.isDown("a") then
-            self.facing_direction = "left"
-            self.position.x = self.position.x - self.speed * dt
+        if self.attacked_velocity == 0.0 then
+            if love.keyboard.isDown("d") then
+                self.facing_direction = "right"
+                self.position.x = self.position.x + self.speed * dt
+            elseif love.keyboard.isDown("a") then
+                self.facing_direction = "left"
+                self.position.x = self.position.x - self.speed * dt
+            end
         end
     end
 
@@ -122,7 +153,6 @@ function player:update_animation(dt)
             self.frame_time = 0.150
             self.frame_quad:setViewport(self.frame_width * self.frame_number, 0, self.frame_width, self.frame_height)
         end
-
     end
 end
 
@@ -161,8 +191,14 @@ function player:change_animation()
 end
 
 function player:draw()
+    if self.attacked then
+        love.graphics.setShader(self.attacked_shader)
+    end
     love.graphics.draw(self.current_texture, self.frame_quad, self.position.x, self.position.y, 0,
         (self.facing_direction == "right" and 1 or -1) * self.scale, self.scale, self.origin.x, self.origin.y)
+    if self.attacked then
+        love.graphics.setShader()
+    end
     -- if self.collides then
     --     love.graphics.setColor(1, 0, 0, 1)
     -- else
@@ -171,4 +207,24 @@ function player:draw()
     -- love.graphics.rectangle("line", self.collision_rect.x, self.collision_rect.y, self.collision_rect.width,
     --     self.collision_rect.height)
     -- love.graphics.setColor(1, 1, 1, 1)
+end
+
+function player:handle_attacked_state(dt)
+    self.attacked_radian_value = self.attacked_radian_value - dt * 10.0
+    local value = math.abs(math.sin(self.attacked_radian_value))
+    self.attacked_shader:send("red", value)
+
+    if ((value > 0.99 or value < 0.1) and self.can_increase_attacked_color_count) then
+        self.can_increase_attacked_color_count = false
+        self.attacked_color_count = self.attacked_color_count + 1
+    else
+        self.can_increase_attacked_color_count = true
+    end
+
+    if self.attacked_color_count == 6 then
+        self.attacked = false;
+        self.attacked_color_count = 0
+        self.attacked_radian_value = 0.0
+        self.can_increase_attacked_color_count = true
+    end
 end

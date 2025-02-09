@@ -2,24 +2,27 @@ fireballs = {}
 
 function fireballs:load()
     self.texture = love.graphics.newImage("res/image/fireball.png")
+    self.spawn_timer = 1.0
     self.list = {}
-
-    table.insert(self.list, { position = { x = 200, y = 200 }, velocity = 700, fires = {}, add_fire_timer = 0.01 })
-    table.insert(self.list,
-        { position = { x = virtual_width - 200, y = 500 }, velocity = -600, fires = {}, add_fire_timer = 0.01 })
-    table.insert(self.list,
-        { position = { x = virtual_width - 300, y = 700 }, velocity = -800, fires = {}, add_fire_timer = 0.01 })
 end
 
 function fireballs:update(dt)
+    self.spawn_timer = self.spawn_timer - dt
+    if self.spawn_timer < 0.0 then
+        self.spawn_timer = 1.0
+        self:spawn()
+    end
+
     for i = #self.list, 1, -1 do
         local fireball = self.list[i]
 
-        if fireball.position.x < -200 or fireball.position.x > virtual_width + 200 then
+        if fireball.position.x < -500 or fireball.position.x > (virtual_width + 500) then
             table.remove(self.list, i)
         else
             fireball.position.x = fireball.position.x + fireball.velocity * dt
             fireball.add_fire_timer = fireball.add_fire_timer - dt
+            fireball.collision_rect.x = fireball.position.x - self.texture:getWidth() / 2 * 2.5
+            fireball.collision_rect.y = fireball.position.y - self.texture:getHeight() / 2 * 2.5
 
             if fireball.add_fire_timer < 0.0 then
                 fireball.add_fire_timer = 0.01
@@ -129,4 +132,30 @@ function fireballs:handle_fires(fires, position, dt)
             end
         end
     end
+end
+
+function fireballs:spawn()
+    local direction = (love.math.random(0, 1) == 1 and 1) or -1
+    local velocity = ({ 600, 700, 800 })[love.math.random(1, 3)] * direction
+    local x = (direction == 1) and -500 or virtual_width + 500;
+    local y = love.math.random(100, virtual_height - 200)
+    table.insert(self.list,
+        {
+            position = { x = x, y = y },
+            velocity = velocity,
+            fires = {},
+            add_fire_timer = 0.01,
+            collision_rect = {
+                x = x - self.texture:getWidth() / 2 * 2.5,
+                y = y - self.texture:getHeight() / 2 * 2.5,
+                width = self.texture:getWidth() * 2.5,
+                height = self.texture:getHeight() * 2.5,
+                aabb_info = {
+                    overlap_x = 0,
+                    overlap_y = 0,
+                    previous_overlap_x = 0,
+                    previous_overlap_y = 0
+                }
+            }
+        })
 end
