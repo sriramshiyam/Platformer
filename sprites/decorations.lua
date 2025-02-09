@@ -58,9 +58,41 @@ function decorations:load()
                     tex_type = dec,
                     position = { x = x, y = y },
                     scale = scale,
-                    texture = dec_texture
+                    texture = dec_texture,
+                    x_spring = {
+                        rest_length = x,
+                        damping = 0.7,
+                        velocity = 0.0,
+                        force = 0,
+                        k = 0.1,
+                    },
+                    y_spring = {
+                        rest_length = y,
+                        damping = 0.7,
+                        velocity = 0.0,
+                        force = 0,
+                        k = 0.1,
+                    }
                 })
         end
+    end
+end
+
+function decorations:update(dt)
+    for i = 1, #self.decs do
+        local x_spring = self.decs[i].x_spring
+        local x = self.decs[i].position.x - x_spring.rest_length
+        x_spring.force = -x_spring.k * x;
+        x_spring.velocity = x_spring.velocity + x_spring.force
+        self.decs[i].position.x = self.decs[i].position.x + x_spring.velocity
+        x_spring.velocity = x_spring.velocity * x_spring.damping
+
+        local y_spring = self.decs[i].y_spring
+        x = self.decs[i].position.y - y_spring.rest_length
+        y_spring.force = -y_spring.k * x;
+        y_spring.velocity = y_spring.velocity + y_spring.force
+        self.decs[i].position.y = self.decs[i].position.y + y_spring.velocity
+        y_spring.velocity = y_spring.velocity * y_spring.damping
     end
 end
 
@@ -87,4 +119,11 @@ function decorations:get_pumpkin_positions()
         end
     end
     return pumpkin_positions
+end
+
+function decorations:add_shake_effect()
+    for i = 1, #self.decs do
+        self.decs[i].position.x = self.decs[i].position.x + 12.5
+        self.decs[i].position.y = self.decs[i].position.y + 12.5
+    end
 end

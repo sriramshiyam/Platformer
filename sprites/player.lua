@@ -19,10 +19,10 @@ function player:load()
     self.scale = 3.5
     self.origin = { x = self.frame_width / 2, y = self.frame_height / 2 }
     self.position = { x = 100, y = 100 }
-    self.outline_width = self.frame_width * 0.8 * self.scale
+    self.outline_width = self.frame_width * 0.7 * self.scale
     self.outline_height = self.frame_height * self.scale
     self.collision_rect = {
-        x = self.position.x - (self.outline_width * 0.5 / 2),
+        x = self.position.x - (self.outline_width * 0.4 / 2),
         y = self.position.y - (self.outline_height / 2),
         width = self.outline_width * 0.65,
         height = self.outline_height

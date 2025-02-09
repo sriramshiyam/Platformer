@@ -52,6 +52,20 @@ function tilemap:load()
                         overlap_y = 0,
                         previous_overlap_x = 0,
                         previous_overlap_y = 0
+                    },
+                    x_spring = {
+                        rest_length = x,
+                        damping = 0.7,
+                        velocity = 0.0,
+                        force = 0,
+                        k = 0.1,
+                    },
+                    y_spring = {
+                        rest_length = y,
+                        damping = 0.7,
+                        velocity = 0.0,
+                        force = 0,
+                        k = 0.1,
                     }
                 }
             else
@@ -62,6 +76,20 @@ function tilemap:load()
                 rect = { x = x, y = y, width = 72, height = 72 },
                 quad = love.graphics.newQuad(x_offset, y_offset, 72, 72, self.texture:getWidth(),
                     self.texture:getHeight()),
+                x_spring = {
+                    rest_length = x,
+                    damping = 0.7,
+                    velocity = 0.0,
+                    force = 0,
+                    k = 0.1,
+                },
+                y_spring = {
+                    rest_length = y,
+                    damping = 0.7,
+                    velocity = 0.0,
+                    force = 0,
+                    k = 0.1,
+                }
             })
         else
             if collision_rect ~= nil then
@@ -77,6 +105,37 @@ function tilemap:load()
 end
 
 function tilemap:update(dt)
+    for i = 1, #self.tiles do
+        local x_spring = self.tiles[i].x_spring
+        local x = self.tiles[i].rect.x - x_spring.rest_length
+        x_spring.force = -x_spring.k * x;
+        x_spring.velocity = x_spring.velocity + x_spring.force
+        self.tiles[i].rect.x = self.tiles[i].rect.x + x_spring.velocity
+        x_spring.velocity = x_spring.velocity * x_spring.damping
+
+        local y_spring = self.tiles[i].y_spring
+        x = self.tiles[i].rect.y - y_spring.rest_length
+        y_spring.force = -y_spring.k * x;
+        y_spring.velocity = y_spring.velocity + y_spring.force
+        self.tiles[i].rect.y = self.tiles[i].rect.y + y_spring.velocity
+        y_spring.velocity = y_spring.velocity * y_spring.damping
+    end
+
+    for i = 1, #self.collision_rects do
+        local x_spring = self.collision_rects[i].x_spring
+        local x = self.collision_rects[i].x - x_spring.rest_length
+        x_spring.force = -x_spring.k * x;
+        x_spring.velocity = x_spring.velocity + x_spring.force
+        self.collision_rects[i].x = self.collision_rects[i].x + x_spring.velocity
+        x_spring.velocity = x_spring.velocity * x_spring.damping
+
+        local y_spring = self.collision_rects[i].y_spring
+        x = self.collision_rects[i].y - y_spring.rest_length
+        y_spring.force = -y_spring.k * x;
+        y_spring.velocity = y_spring.velocity + y_spring.force
+        self.collision_rects[i].y = self.collision_rects[i].y + y_spring.velocity
+        y_spring.velocity = y_spring.velocity * y_spring.damping
+    end
 end
 
 function tilemap:draw()
@@ -95,4 +154,16 @@ function tilemap:draw()
     --         self.collision_rects[i].width, self.collision_rects[i].height)
     --     love.graphics.setColor(1, 1, 1, 1)
     -- end
+end
+
+function tilemap:add_shake_effect()
+    for i = 1, #self.tiles do
+        self.tiles[i].rect.x = self.tiles[i].rect.x + 12.5
+        self.tiles[i].rect.y = self.tiles[i].rect.y + 12.5
+    end
+
+    for i = 1, #self.collision_rects do
+        self.collision_rects[i].x = self.collision_rects[i].x + 12.5
+        self.collision_rects[i].y = self.collision_rects[i].y + 12.5
+    end
 end

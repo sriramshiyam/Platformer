@@ -5,6 +5,7 @@ require "sprites.glow"
 require "sprites.decorations"
 require "sprites.player"
 require "sprites.fireballs"
+require "sprites.explosion"
 require "utils.tilemap"
 require "utils.collision"
 
@@ -29,6 +30,7 @@ end
 function love.load()
     love.window.setTitle("Platformer")
     love.window.setMode(800, 600, { resizable = true })
+    love.window.setPosition(0, 0, 2)
     love.window.maximize()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
@@ -40,6 +42,7 @@ function love.load()
     tilemap:load()
     glow:load()
     fireballs:load()
+    explosion:load()
     glow.decoration_positions = decorations:get_pumpkin_positions()
 end
 
@@ -47,7 +50,10 @@ function love.update(dt)
     glow:update(dt)
     player:update(dt)
     fireballs:update(dt)
-
+    explosion:update(dt)
+    tilemap:update(dt)
+    decorations:update(dt)
+    background:update(dt)
     glow.fireball_positions = fireballs:get_fireball_positions()
 
     player.collides = false
@@ -67,15 +73,21 @@ function love.update(dt)
         end
     end
 
-    if player.attacked_velocity == 0.0 then
-        for i = 1, #fireballs.list do
+    if player.attacked_velocity == 0.0 and not player.attacked then
+        for i = #fireballs.list, 1, -1 do
             local fireball = fireballs.list[i]
             if distance(player.collision_rect.x, player.collision_rect.y, fireball.collision_rect.x, fireball.collision_rect.y) < 200 and collides(player.collision_rect, fireball.collision_rect, "fireball") then
+                table.remove(fireballs.list, i)
+                decorations:add_shake_effect()
+                tilemap:add_shake_effect()
+                background:add_shake_effect()
                 sound.attacked:play()
+                explosion:spawn(fireball.collision_rect.x + fireballs.texture:getWidth() / 2,
+                    fireball.collision_rect.y + fireballs.texture:getHeight() / 2)
                 player.attacked_direction = (fireball.velocity > 0 and 1) or -1
                 player.attacked_velocity = 500 * player.attacked_direction
                 player.attacked = true
-                player.y_velocity = -player.jump_velocity
+                player.y_velocity = -player.jump_velocity / 1.25
             end
         end
     end
@@ -92,6 +104,7 @@ function love.draw()
     player:draw()
     fireballs:draw()
     glow:draw()
+    explosion:draw()
     print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()
