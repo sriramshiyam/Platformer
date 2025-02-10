@@ -5,6 +5,7 @@ function glow:load()
     self.canvas = love.graphics.newCanvas(200, 200);
     self.decoration_positions = {}
     self.fireball_positions = {}
+    self.ghost_position = { x = 0, y = 0 }
     local shader_src = love.filesystem.read("res/shaders/glow.glsl")
     self.shader = love.graphics.newShader(shader_src)
 end
@@ -29,6 +30,11 @@ function glow:draw()
         love.graphics.draw(self.canvas, self.fireball_positions[i].x, self.fireball_positions[i].y, 0, 1.25, 1.25,
             self.canvas:getWidth() / 2, self.canvas:getHeight() / 2)
     end
+
+    self.shader:send("glow_color", { 1, 1, 1 })
+
+    love.graphics.draw(self.canvas, self.ghost_position.x, self.ghost_position.y, 0, 1, 1,
+        self.canvas:getWidth() / 2, self.canvas:getHeight() / 2)
 
     love.graphics.setShader()
 end

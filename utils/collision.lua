@@ -34,6 +34,14 @@ function collides(player_rect, object_rect, type)
                     player.y_velocity = 0
                     player.can_animate = true
                 end
+            elseif type == "ghost" then
+                if center1.y < center2.y and player.in_air then
+                    player.y_velocity = -player.jump_velocity / 1.25
+                    ghost.is_enabled = false
+                    ghost:spawn()
+                    sound.ghost:play()
+                    return false
+                end
             end
         else
             player.y_velocity = 0

@@ -5,4 +5,5 @@ function sound:load()
     self.attacked:setVolume(0.5)
     self.player_crouch = love.audio.newSource("res/sound/player_crouch.wav", "static")
     self.player_jump = love.audio.newSource("res/sound/player_jump.wav", "static")
+    self.ghost = love.audio.newSource("res/sound/ghost.wav", "static")
 end

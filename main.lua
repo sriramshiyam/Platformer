@@ -58,7 +58,8 @@ function love.update(dt)
     background:update(dt)
     ghost:update(dt)
     glow.fireball_positions = fireballs:get_fireball_positions()
-
+    glow.ghost_position.x = ghost.position.x
+    glow.ghost_position.y = ghost.position.y
     player.collides = false
 
     for i = 1, #tilemap.collision_rects do
@@ -91,6 +92,23 @@ function love.update(dt)
                 player.attacked_velocity = 500 * player.attacked_direction
                 player.attacked = true
                 player.y_velocity = -player.jump_velocity / 1.25
+                return
+            end
+        end
+
+        if distance(player.collision_rect.x, player.collision_rect.y, ghost.position.x, ghost.position.y) < 200 then
+            if collides(player.collision_rect, ghost.collision_rect, "ghost") then
+                decorations:add_shake_effect()
+                tilemap:add_shake_effect()
+                background:add_shake_effect()
+                sound.attacked:play()
+                player.attacked_direction = (ghost.position.x < player.position.x and 1) or -1
+                player.attacked_velocity = 500 * player.attacked_direction
+                player.y_velocity = -player.jump_velocity / 1.25
+                player.attacked = true
+                ghost.is_enabled = false
+                ghost:spawn()
+                sound.ghost:play()
             end
         end
     end
@@ -105,9 +123,9 @@ function love.draw()
     decorations:draw()
     player:draw()
     fireballs:draw()
+    ghost:draw()
     glow:draw()
     explosion:draw()
-    ghost:draw()
     print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()

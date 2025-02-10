@@ -2,14 +2,14 @@ fireballs = {}
 
 function fireballs:load()
     self.texture = love.graphics.newImage("res/image/fireball.png")
-    self.spawn_timer = 1.1
+    self.spawn_timer = 1.05
     self.list = {}
 end
 
 function fireballs:update(dt)
     self.spawn_timer = self.spawn_timer - dt
     if self.spawn_timer < 0.0 then
-        self.spawn_timer = 1.1
+        self.spawn_timer = 1.05
         self:spawn()
     end
 
