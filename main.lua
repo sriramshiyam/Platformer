@@ -6,6 +6,7 @@ require "sprites.decorations"
 require "sprites.player"
 require "sprites.fireballs"
 require "sprites.explosion"
+require "sprites.ghost"
 require "utils.tilemap"
 require "utils.collision"
 
@@ -43,6 +44,7 @@ function love.load()
     glow:load()
     fireballs:load()
     explosion:load()
+    ghost:load()
     glow.decoration_positions = decorations:get_pumpkin_positions()
 end
 
@@ -54,6 +56,7 @@ function love.update(dt)
     tilemap:update(dt)
     decorations:update(dt)
     background:update(dt)
+    ghost:update(dt)
     glow.fireball_positions = fireballs:get_fireball_positions()
 
     player.collides = false
@@ -94,7 +97,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    glow:draw()
     love.graphics.clear()
     love.graphics.setCanvas(canvas)
     love.graphics.clear(0, 0, 0, 1)
@@ -105,6 +107,7 @@ function love.draw()
     fireballs:draw()
     glow:draw()
     explosion:draw()
+    ghost:draw()
     print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()

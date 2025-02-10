@@ -158,12 +158,12 @@ end
 
 function tilemap:add_shake_effect()
     for i = 1, #self.tiles do
-        self.tiles[i].rect.x = self.tiles[i].rect.x + 12.5
-        self.tiles[i].rect.y = self.tiles[i].rect.y + 12.5
+        self.tiles[i].rect.x = self.tiles[i].rect.x + 15
+        self.tiles[i].rect.y = self.tiles[i].rect.y + 15
     end
 
     for i = 1, #self.collision_rects do
-        self.collision_rects[i].x = self.collision_rects[i].x + 12.5
-        self.collision_rects[i].y = self.collision_rects[i].y + 12.5
+        self.collision_rects[i].x = self.collision_rects[i].x + 15
+        self.collision_rects[i].y = self.collision_rects[i].y + 15
     end
 end
