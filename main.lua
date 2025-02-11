@@ -14,6 +14,8 @@ virtual_height = 1080
 virtual_width = 1872
 
 local canvas
+local vignette_canvas
+local vignette_shader
 
 canvasOffsetX = 0
 canvasOffsetY = 0
@@ -26,6 +28,10 @@ function draw_canvas()
     canvasOffsetX = (windowWidth - virtual_width * scale) / 2
     canvasOffsetY = (windowHeight - virtual_height * scale) / 2
     love.graphics.draw(canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
+    love.graphics.setShader(vignette_shader)
+    love.graphics.draw(vignette_canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
+    love.graphics.setShader()
+    print_memory_usage()
 end
 
 function love.load()
@@ -35,6 +41,9 @@ function love.load()
     love.window.maximize()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
+    vignette_canvas = love.graphics.newCanvas(virtual_width, virtual_height)
+    local shader_src = love.filesystem.read("res/shaders/vignette.glsl")
+    vignette_shader = love.graphics.newShader(shader_src)
     sound:load()
     music:load()
     background:load()
@@ -126,7 +135,6 @@ function love.draw()
     ghost:draw()
     glow:draw()
     explosion:draw()
-    print_memory_usage()
     love.graphics.setCanvas()
     draw_canvas()
 end
