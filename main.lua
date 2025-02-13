@@ -34,10 +34,14 @@ function draw_canvas()
     print_memory_usage()
 end
 
-function love.load()
+function love.load(arg)
     love.window.setTitle("Platformer")
     love.window.setMode(800, 600, { resizable = true })
-    love.window.setPosition(0, 0, 2)
+    for i = 1, #arg do
+        if arg[i] == "monitor-2" then
+            love.window.setPosition(0, 0, 2)
+        end
+    end
     love.window.maximize()
     love.graphics.setDefaultFilter("nearest", "nearest")
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
@@ -105,7 +109,7 @@ function love.update(dt)
             end
         end
 
-        if distance(player.collision_rect.x, player.collision_rect.y, ghost.position.x, ghost.position.y) < 200 then
+        if not ghost.is_exploding and distance(player.collision_rect.x, player.collision_rect.y, ghost.position.x, ghost.position.y) < 200 then
             if collides(player.collision_rect, ghost.collision_rect, "ghost") then
                 decorations:add_shake_effect()
                 tilemap:add_shake_effect()
@@ -116,7 +120,7 @@ function love.update(dt)
                 player.y_velocity = -player.jump_velocity / 1.25
                 player.attacked = true
                 ghost.is_enabled = false
-                ghost:spawn()
+                ghost:explode()
                 sound.ghost:play()
             end
         end

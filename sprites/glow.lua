@@ -31,10 +31,11 @@ function glow:draw()
             self.canvas:getWidth() / 2, self.canvas:getHeight() / 2)
     end
 
-    self.shader:send("glow_color", { 1, 1, 1 })
+    if not ghost.is_exploding then
+        self.shader:send("glow_color", { 1, 1, 1 })
 
-    love.graphics.draw(self.canvas, self.ghost_position.x, self.ghost_position.y, 0, 1, 1,
-        self.canvas:getWidth() / 2, self.canvas:getHeight() / 2)
-
+        love.graphics.draw(self.canvas, self.ghost_position.x, self.ghost_position.y, 0, 1, 1,
+            self.canvas:getWidth() / 2, self.canvas:getHeight() / 2)
+    end
     love.graphics.setShader()
 end
