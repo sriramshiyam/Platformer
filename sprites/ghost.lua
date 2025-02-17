@@ -27,7 +27,7 @@ function ghost:load()
     self.is_enabled = false
     self.direction = -1
     self.speed = 225
-    self.spawn_timer = 0.0
+    self.spawn_timer = 5.0
     self.y_velocity_factor = 90.0
     self.is_exploding = false
     self.explosion_list = {}

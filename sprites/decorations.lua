@@ -123,7 +123,7 @@ end
 
 function decorations:add_shake_effect()
     for i = 1, #self.decs do
-        self.decs[i].position.x = self.decs[i].position.x + 15
-        self.decs[i].position.y = self.decs[i].position.y + 15
+        self.decs[i].position.x = self.decs[i].position.x + 30
+        self.decs[i].position.y = self.decs[i].position.y + 30
     end
 end

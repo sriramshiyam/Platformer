@@ -18,7 +18,7 @@ function player:load()
         self.current_texture:getHeight())
     self.scale = 3.5
     self.origin = { x = self.frame_width / 2, y = self.frame_height / 2 }
-    self.position = { x = 100, y = 100 }
+    self.position = { x = 880, y = 880 }
     self.outline_width = self.frame_width * 0.7 * self.scale
     self.outline_height = self.frame_height * self.scale
     self.collision_rect = {
@@ -42,6 +42,7 @@ function player:load()
     self.attacked_shader = love.graphics.newShader(shader_src)
     self.attacked_velocity = 0.0
     self.attacked_direction = 0
+    self.health = 3
 end
 
 function player:update(dt)
@@ -123,6 +124,12 @@ function player:handle_input(dt)
                 self.facing_direction = "left"
                 self.position.x = self.position.x - self.speed * dt
             end
+        end
+
+        if self.position.x < (self.collision_rect.width / 2) then
+            self.position.x = self.collision_rect.width / 2
+        elseif self.position.x > (virtual_width - self.collision_rect.width / 2) then
+            self.position.x = virtual_width - self.collision_rect.width / 2
         end
     end
 
@@ -210,7 +217,7 @@ function player:draw()
 end
 
 function player:handle_attacked_state(dt)
-    self.attacked_radian_value = self.attacked_radian_value - dt * 10.0
+    self.attacked_radian_value = self.attacked_radian_value - dt * 5.0
     local value = math.abs(math.sin(self.attacked_radian_value))
     self.attacked_shader:send("red", value)
 
@@ -221,7 +228,7 @@ function player:handle_attacked_state(dt)
         self.can_increase_attacked_color_count = true
     end
 
-    if self.attacked_color_count == 6 then
+    if self.attacked_color_count == 11 then
         self.attacked = false;
         self.attacked_color_count = 0
         self.attacked_radian_value = 0.0

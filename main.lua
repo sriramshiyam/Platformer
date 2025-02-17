@@ -9,6 +9,7 @@ require "sprites.explosion"
 require "sprites.ghost"
 require "utils.tilemap"
 require "utils.collision"
+require "utils.hud"
 
 virtual_height = 1080
 virtual_width = 1872
@@ -31,10 +32,11 @@ function draw_canvas()
     love.graphics.setShader(vignette_shader)
     love.graphics.draw(vignette_canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
     love.graphics.setShader()
-    print_memory_usage()
+    -- print_memory_usage()
 end
 
 function love.load(arg)
+    default_font = love.graphics.getFont()
     love.window.setTitle("Platformer")
     love.window.setMode(800, 600, { resizable = true })
     for i = 1, #arg do
@@ -47,7 +49,9 @@ function love.load(arg)
     canvas = love.graphics.newCanvas(virtual_width, virtual_height)
     vignette_canvas = love.graphics.newCanvas(virtual_width, virtual_height)
     local shader_src = love.filesystem.read("res/shaders/vignette.glsl")
+    state = ""
     vignette_shader = love.graphics.newShader(shader_src)
+    hud:load()
     sound:load()
     music:load()
     background:load()
@@ -62,14 +66,18 @@ function love.load(arg)
 end
 
 function love.update(dt)
+    sound:update(dt)
+    hud:update(dt)
     glow:update(dt)
     player:update(dt)
-    fireballs:update(dt)
+    if state == "game" then
+        fireballs:update(dt)
+        ghost:update(dt)
+    end
     explosion:update(dt)
     tilemap:update(dt)
     decorations:update(dt)
     background:update(dt)
-    ghost:update(dt)
     glow.fireball_positions = fireballs:get_fireball_positions()
     glow.ghost_position.x = ghost.position.x
     glow.ghost_position.y = ghost.position.y
@@ -105,6 +113,7 @@ function love.update(dt)
                 player.attacked_velocity = 500 * player.attacked_direction
                 player.attacked = true
                 player.y_velocity = -player.jump_velocity / 1.25
+                player.health = player.health - 1
                 return
             end
         end
@@ -119,6 +128,7 @@ function love.update(dt)
                 player.attacked_velocity = 500 * player.attacked_direction
                 player.y_velocity = -player.jump_velocity / 1.25
                 player.attacked = true
+                player.health = player.health - 1
                 ghost.is_enabled = false
                 ghost:explode()
                 sound.ghost:play()
@@ -139,11 +149,13 @@ function love.draw()
     ghost:draw()
     glow:draw()
     explosion:draw()
+    hud:draw()
     love.graphics.setCanvas()
     draw_canvas()
 end
 
 function print_memory_usage()
+    love.graphics.setFont(default_font)
     local luaMemory = collectgarbage("count") / 1024
     local stats = love.graphics.getStats()
     local textureMemory = stats.texturememory / 1024 / 1024

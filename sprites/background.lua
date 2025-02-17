@@ -48,6 +48,6 @@ function background:draw()
 end
 
 function background:add_shake_effect()
-    self.x = self.x + 15
-    self.y = self.y + 15
+    self.x = self.x + 30
+    self.y = self.y + 30
 end
