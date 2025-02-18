@@ -43,6 +43,10 @@ function player:load()
     self.attacked_velocity = 0.0
     self.attacked_direction = 0
     self.health = 3
+    self.previous_x = 880
+    self.previous_y = 880
+    self.after_image_list = {}
+    self.after_image_timer = 0.1
 end
 
 function player:update(dt)
@@ -79,6 +83,20 @@ function player:update(dt)
 
     self:handle_input(dt)
     self:update_animation(dt)
+
+    if (self.previous_x ~= self.position.x) or (self.previous_y ~= self.position.y) then
+        self.previous_x = self.position.x
+        self.previous_y = self.position.y
+        self.after_image_timer = self.after_image_timer - dt
+        if self.after_image_timer < 0.0 then
+            self.after_image_timer = 0.1
+            self:add_after_image()
+        end
+    else
+        self.after_image_timer = 0.1
+    end
+
+    self:handle_after_images(dt)
 end
 
 function player:handle_input(dt)
@@ -198,6 +216,7 @@ function player:change_animation()
 end
 
 function player:draw()
+    self:draw_after_images()
     if self.attacked then
         love.graphics.setShader(self.attacked_shader)
     end
@@ -233,5 +252,37 @@ function player:handle_attacked_state(dt)
         self.attacked_color_count = 0
         self.attacked_radian_value = 0.0
         self.can_increase_attacked_color_count = true
+    end
+end
+
+function player:add_after_image()
+    local after_image = {}
+    after_image.x = self.position.x
+    after_image.y = self.position.y
+    after_image.facing_direction = self.facing_direction
+    after_image.texture = self.current_texture
+    after_image.frame_quad = love.graphics.newQuad(self.frame_width * self.frame_number, 0, self.frame_width,
+        self.frame_height, self.current_texture:getWidth(), self.current_texture:getHeight())
+    after_image.opacity = 0.8
+    table.insert(self.after_image_list, after_image)
+end
+
+function player:handle_after_images(dt)
+    for i = #self.after_image_list, 1, -1 do
+        local after_image = self.after_image_list[i]
+        after_image.opacity = after_image.opacity - 1.5 * dt
+        if after_image.opacity < 0.0 then
+            table.remove(self.after_image_list, i)
+        end
+    end
+end
+
+function player:draw_after_images()
+    for i = 1, #self.after_image_list do
+        local after_image = self.after_image_list[i]
+        love.graphics.setColor(1, 1, 1, after_image.opacity)
+        love.graphics.draw(after_image.texture, after_image.frame_quad, after_image.x, after_image.y, 0,
+            (after_image.facing_direction == "right" and 1 or -1) * self.scale, self.scale, self.origin.x, self.origin.y)
+        love.graphics.setColor(1, 1, 1, 1)
     end
 end

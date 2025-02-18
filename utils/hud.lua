@@ -6,22 +6,22 @@ function hud:load()
         {
             text = "3",
             x = virtual_width / 2 - self.font:getWidth("3") / 2,
-            y = 50
+            y = 20
         },
         {
             text = "2",
             x = virtual_width / 2 - self.font:getWidth("2") / 2,
-            y = 50
+            y = 20
         },
         {
             text = "1",
             x = virtual_width / 2 - self.font:getWidth("1") / 2,
-            y = 50
+            y = 20
         },
         {
             text = "GO",
             x = virtual_width / 2 - self.font:getWidth("GO") / 2,
-            y = 50
+            y = 20
         },
         index = 1
     }
@@ -31,9 +31,15 @@ function hud:load()
     self.health_frame_quad = love.graphics.newQuad(0, 0, self.health_frame_width, self.health_frame_height,
         self.health_texture:getWidth(), self.health_texture:getHeight())
     self.previous_health = -1
+    self.score_timer = 0.0
+    self.formated_timer = ""
 end
 
 function hud:update(dt)
+    if sound.start_sound.index > 4 then
+        self.score_timer = self.score_timer + dt
+        self.formated_timer = string.format("%.2f", self.score_timer)
+    end
     self.timer.index = sound.start_sound.index
     if player.health > 0 and self.previous_health ~= player.health then
         self.previous_health = player.health
@@ -43,12 +49,15 @@ function hud:update(dt)
 end
 
 function hud:draw()
+    love.graphics.setFont(self.font)
     if self.timer.index <= 4 then
-        love.graphics.setFont(self.font)
         local info = self.timer[self.timer.index]
         love.graphics.print(info.text, info.x, info.y)
     end
     if player.health > 0 then
         love.graphics.draw(self.health_texture, self.health_frame_quad, 50, 40, 0, 2, 2)
+    end
+    if sound.start_sound.index > 4 then
+        love.graphics.print(self.formated_timer, virtual_width / 2 - 150, 20)
     end
 end
