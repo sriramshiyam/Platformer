@@ -1,3 +1,3 @@
 # HAUNTED HEAT!
 
-![gameplay](res/gameplay.gif)
+<image src="res/gameplay.gif" width="100%" />
