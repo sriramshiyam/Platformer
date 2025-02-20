@@ -8,19 +8,19 @@ local canvas
 local vignette_canvas
 local vignette_shader
 
-canvasOffsetX = 0
-canvasOffsetY = 0
+canvas_offset_x = 0
+canvas_offset_y = 0
 
 function draw_canvas()
-    local windowWidth, windowHeight = love.graphics.getDimensions()
+    local window_width, window_height = love.graphics.getDimensions()
 
-    local scale = math.min(windowWidth / virtual_width, windowHeight / virtual_height)
+    local scale = math.min(window_width / virtual_width, window_height / virtual_height)
 
-    canvasOffsetX = (windowWidth - virtual_width * scale) / 2
-    canvasOffsetY = (windowHeight - virtual_height * scale) / 2
-    love.graphics.draw(canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
+    canvas_offset_x = (window_width - virtual_width * scale) / 2
+    canvas_offset_y = (window_height - virtual_height * scale) / 2
+    love.graphics.draw(canvas, canvas_offset_x, canvas_offset_y, 0, scale, scale)
     love.graphics.setShader(vignette_shader)
-    love.graphics.draw(vignette_canvas, canvasOffsetX, canvasOffsetY, 0, scale, scale)
+    love.graphics.draw(vignette_canvas, canvas_offset_x, canvas_offset_y, 0, scale, scale)
     love.graphics.setShader()
     -- print_memory_usage()
 end

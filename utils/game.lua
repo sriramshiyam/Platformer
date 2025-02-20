@@ -33,7 +33,7 @@ function game:update(dt)
     hud:update(dt)
     glow:update(dt)
     player:update(dt)
-    if state == "game" then
+    if sound.start_sound.index > 4 then
         fireballs:update(dt)
         ghost:update(dt)
     end

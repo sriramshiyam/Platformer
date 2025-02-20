@@ -20,6 +20,7 @@ function sound:load()
     self.start_sound[2]:setPitch(1.1)
     self.start_sound[3]:setPitch(1.1)
     self.start_sound[4]:setPitch(1.1)
+    self.select = love.audio.newSource("res/sound/select.wav", "static")
 end
 
 function sound:update(dt)
@@ -34,7 +35,5 @@ function sound:update(dt)
             self.start_sound.played = false
             self.start_sound.index = self.start_sound.index + 1
         end
-    else
-        state = "game"
     end
 end

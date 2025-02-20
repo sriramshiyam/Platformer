@@ -44,7 +44,6 @@ function player:load()
     self.attacked_direction = 0
     self.health = 3
     self.previous_x = 880
-    self.previous_y = 880
     self.after_image_list = {}
     self.after_image_timer = 0.1
 end
@@ -84,9 +83,8 @@ function player:update(dt)
     self:handle_input(dt)
     self:update_animation(dt)
 
-    if (self.previous_x ~= self.position.x) or (self.previous_y ~= self.position.y) then
+    if (self.previous_x ~= self.position.x) or self.in_air then
         self.previous_x = self.position.x
-        self.previous_y = self.position.y
         self.after_image_timer = self.after_image_timer - dt
         if self.after_image_timer < 0.0 then
             self.after_image_timer = 0.1
