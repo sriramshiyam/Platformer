@@ -29,8 +29,10 @@ function game:load()
 end
 
 function game:update(dt)
-    sound:update(dt)
-    hud:update(dt)
+    if not loading.enabled then
+        sound:update(dt)
+        hud:update(dt)
+    end
     glow:update(dt)
     player:update(dt)
     if sound.start_sound.index > 4 then
@@ -109,5 +111,7 @@ function game:draw()
     ghost:draw()
     glow:draw()
     explosion:draw()
-    hud:draw()
+    if not loading.enabled then
+        hud:draw()
+    end
 end

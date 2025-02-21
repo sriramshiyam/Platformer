@@ -1,5 +1,6 @@
 require "utils.game"
 require "utils.menu"
+require "utils.loading"
 
 virtual_height = 1080
 virtual_width = 1872
@@ -43,6 +44,7 @@ function love.load(arg)
     state = "menu"
     menu:load()
     game:load()
+    loading:load()
 end
 
 function love.update(dt)
@@ -51,6 +53,7 @@ function love.update(dt)
     elseif state == "game" then
         game:update(dt)
     end
+    loading:update(dt)
 end
 
 function love.draw()
@@ -62,6 +65,7 @@ function love.draw()
     elseif state == "game" then
         game:draw()
     end
+    loading:draw()
     love.graphics.setCanvas()
     draw_canvas()
 end

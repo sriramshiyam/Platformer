@@ -22,7 +22,10 @@ function menu:load()
             hovered = false,
             action = function()
                 sound.select:play()
-                state = "game"
+                loading.enabled = true
+                loading.state_to_change = "game"
+                loading.music_to_play = music.game_music
+                loading.music_to_stop = music.menu_music
             end
         },
         {
@@ -65,6 +68,9 @@ function menu:update(dt)
 end
 
 function menu:update_main_menu(dt)
+    if loading.enabled then
+        return
+    end
     for i = 1, #self.main_menu_options do
         local option = self.main_menu_options[i]
 
