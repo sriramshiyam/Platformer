@@ -2,16 +2,19 @@ menu = {}
 
 function menu:load()
     self.background_texture = love.graphics.newImage("res/image/menu.png")
+    self.title = "HAUNTED HEAT!"
     self.title_font = love.graphics.newFont("res/fonts/upheavtt.ttf", 190)
-    self.title_width = self.title_font:getWidth("HAUNTED HEAT!")
+    self.title_width = self.title_font:getWidth(self.title)
     self.title_y = 10
     self.title_direction = 1
     self.title_move_count = 0
     self.title_move_timer = 0.2
     self.font = love.graphics.newFont("res/fonts/upheavtt.ttf", 100)
-    self.high_score = string.format("BEST TIME: %.2f", 0.0)
-    self.high_score_width = self.font:getWidth(self.high_score)
-    self.menu_type = "main"
+    self.high_score = 0.0
+    self.high_score_text = string.format("BEST TIME: %.2f", self.high_score)
+    self.high_score_width = self.font:getWidth(self.high_score_text)
+    self.type = "main"
+    self.escape_pressed = false
     self.main_menu_options = {
         {
             text = "START",
@@ -22,8 +25,11 @@ function menu:load()
             hovered = false,
             action = function()
                 sound.select:play()
+                loading:init()
                 loading.enabled = true
                 loading.state_to_change = "game"
+                game:init()
+                music.game_music:setPitch(1.0)
                 loading.music_to_play = music.game_music
                 loading.music_to_stop = music.menu_music
             end
@@ -41,9 +47,53 @@ function menu:load()
             end
         }
     }
-    self.main_menu_width = { start = self.font:getWidth("START"), exit = self.font:getWidth("EXIT") }
+    self.pause_menu_options = {
+        {
+            text = "RESUME",
+            width = self.font:getWidth("RESUME"),
+            y = 500,
+            x = virtual_width / 2 - self.font:getWidth("RESUME") / 2,
+            color = { r = 1.0, g = 1.0, b = 1.0 },
+            hovered = false,
+            action = function()
+                sound.select:play()
+                state = "game"
+                love.mouse.setVisible(false)
+                music.game_music:setPitch(1.0)
+            end
+        },
+        {
+            text = "EXIT TO MENU",
+            width = self.font:getWidth("EXIT TO MENU"),
+            y = 625,
+            x = virtual_width / 2 - self.font:getWidth("EXIT TO MENU") / 2,
+            color = { r = 1.0, g = 1.0, b = 1.0 },
+            hovered = false,
+            action = function()
+                sound.select:play()
+                loading:init()
+                loading.enabled = true
+                loading.state_to_change = "menu"
+                loading.music_to_play = music.menu_music
+                loading.music_to_stop = music.game_music
+            end
+        }
+    }
     self.mouse_x = 0
     self.mouse_y = 0
+end
+
+function menu:change_title(title)
+    self.title = title
+    self.title_width = self.title_font:getWidth(self.title)
+end
+
+function menu:change_highscore(score)
+    if score > self.high_score then
+        self.high_score = score
+        self.high_score_text = string.format("BEST TIME: %.2f", self.high_score)
+        self.high_score_width = self.font:getWidth(self.high_score_text)
+    end
 end
 
 function menu:update(dt)
@@ -60,19 +110,14 @@ function menu:update(dt)
 
     self:track_mouse()
 
-    if self.menu_type == "main" then
-        self:update_main_menu(dt)
-    else
-        self:update_pause_menu(dt)
-    end
-end
-
-function menu:update_main_menu(dt)
     if loading.enabled then
         return
     end
-    for i = 1, #self.main_menu_options do
-        local option = self.main_menu_options[i]
+
+    local menu_options = (self.type == "main" and self.main_menu_options) or self.pause_menu_options
+
+    for i = 1, #menu_options do
+        local option = menu_options[i]
 
         local rectangle = {
             x = option.x - 15,
@@ -100,10 +145,6 @@ function menu:update_main_menu(dt)
     end
 end
 
-function menu:update_pause_menu(dt)
-
-end
-
 function menu:track_mouse()
     local window_width, window_height = love.graphics.getDimensions()
 
@@ -121,39 +162,33 @@ function menu:draw()
         virtual_height / self.background_texture:getHeight())
 
     love.graphics.setFont(self.title_font)
-    love.graphics.print("HAUNTED HEAT!", virtual_width / 2 - self.title_width / 2, self.title_y)
+    love.graphics.print(self.title, virtual_width / 2 - self.title_width / 2, self.title_y)
 
 
-    love.graphics.setColor(0.92, 0.81, 0.20, 0.4)
-    love.graphics.rectangle("fill", virtual_width / 2 - self.high_score_width / 2 - 10, 310, self.high_score_width + 20,
-        self.font:getHeight() - 10)
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+    if self.type == "main" then
+        love.graphics.setColor(0.92, 0.81, 0.20, 0.4)
+        love.graphics.rectangle("fill", virtual_width / 2 - self.high_score_width / 2 - 10, 310,
+            self.high_score_width + 20,
+            self.font:getHeight() - 10)
+        love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 
-    love.graphics.setLineWidth(5)
-    love.graphics.setColor(0.92, 0.81, 0.20, 1.0)
-    love.graphics.rectangle("line", virtual_width / 2 - self.high_score_width / 2 - 10, 310, self.high_score_width + 20,
-        self.font:getHeight() - 10)
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
-    love.graphics.setLineWidth(1)
+        love.graphics.setLineWidth(5)
+        love.graphics.setColor(0.92, 0.81, 0.20, 1.0)
+        love.graphics.rectangle("line", virtual_width / 2 - self.high_score_width / 2 - 10, 310,
+            self.high_score_width + 20,
+            self.font:getHeight() - 10)
+        love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+        love.graphics.setLineWidth(1)
 
-    love.graphics.setFont(self.font)
-    love.graphics.print(self.high_score, virtual_width / 2 - self.high_score_width / 2, 300)
-
-    if self.menu_type == "main" then
-        self:draw_main_menu()
-    else
-        self:draw_pause_menu()
+        love.graphics.setFont(self.font)
+        love.graphics.print(self.high_score_text, virtual_width / 2 - self.high_score_width / 2, 300)
     end
-end
 
-function menu:draw_main_menu()
-    for i = 1, #self.main_menu_options do
-        self:draw_option(self.main_menu_options[i])
+    local menu_options = (self.type == "main" and self.main_menu_options) or self.pause_menu_options
+
+    for i = 1, #menu_options do
+        self:draw_option(menu_options[i])
     end
-end
-
-function menu:draw_pause_menu()
-
 end
 
 function menu:draw_option(option)

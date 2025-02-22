@@ -1,13 +1,17 @@
 glow = {}
 
 function glow:load()
-    self.time = 0
-    self.canvas = love.graphics.newCanvas(200, 200);
+    self:init()
     self.decoration_positions = {}
-    self.fireball_positions = {}
-    self.ghost_position = { x = 0, y = 0 }
+    self.canvas = love.graphics.newCanvas(200, 200);
     local shader_src = love.filesystem.read("res/shaders/glow.glsl")
     self.shader = love.graphics.newShader(shader_src)
+end
+
+function glow:init()
+    self.time = 0
+    self.fireball_positions = {}
+    self.ghost_position = { x = 0, y = 0 }
 end
 
 function glow:update(dt)

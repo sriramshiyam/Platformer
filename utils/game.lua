@@ -28,10 +28,36 @@ function game:load()
     glow.decoration_positions = decorations:get_pumpkin_positions()
 end
 
+function game:init()
+    love.mouse.setVisible(false)
+    hud:init()
+    sound:init()
+    player:init()
+    glow:init()
+    fireballs:init()
+    ghost:init()
+end
+
 function game:update(dt)
+    if not loading.enabled and love.keyboard.isDown("escape") then
+        state = "menu"
+        menu.type = "pause"
+        menu:change_title("PAUSED")
+        love.mouse.setVisible(true)
+        music.game_music:setPitch(0.7)
+        return
+    end
     if not loading.enabled then
         sound:update(dt)
         hud:update(dt)
+    end
+    if not loading.enabled and player.health == 0 then
+        menu:change_highscore(hud.score_timer)
+        loading:init()
+        loading.enabled = true
+        loading.state_to_change = "menu"
+        loading.music_to_play = music.menu_music
+        loading.music_to_stop = music.game_music
     end
     glow:update(dt)
     player:update(dt)

@@ -5,12 +5,16 @@ function loading:load()
     local shader_src = love.filesystem.read("res/shaders/loading.glsl")
     self.loading_shader = love.graphics.newShader(shader_src)
     self.enabled = false
-    self.min = 0.0
-    self.max = 0.0
-    self.draw_timer = 0.0
+    self:init()
     self.state_to_change = ""
     self.music_to_stop = {}
     self.music_to_play = {}
+end
+
+function loading:init()
+    self.min = 0.0
+    self.max = 0.0
+    self.draw_timer = 0.0
     self.direction = "right"
 end
 
@@ -21,6 +25,11 @@ function loading:update(dt)
             if self.max >= 1.0 then
                 self.direction = "left"
                 state = self.state_to_change
+                if state == "menu" then
+                    menu.type = "main"
+                    menu:change_title("HAUNTED HEAT!")
+                    love.mouse.setVisible(true)
+                end
                 self.music_to_stop:stop()
                 self.music_to_play:play()
                 self.draw_timer = 0.0

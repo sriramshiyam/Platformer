@@ -1,13 +1,19 @@
 player = {}
 
 function player:load()
-    self.state = "idle"
-    self.facing_direction = "right"
     self.idle_texture = love.graphics.newImage("res/image/adventurer-idle-sheet.png")
     self.run_texture = love.graphics.newImage("res/image/adventurer-run-sheet.png")
     self.jump_texture = love.graphics.newImage("res/image/adventurer-jump-sheet.png")
     self.fall_texture = love.graphics.newImage("res/image/adventurer-fall-sheet.png")
     self.crouch_texture = love.graphics.newImage("res/image/adventurer-crouch-sheet.png")
+    self:init()
+    local shader_src = love.filesystem.read("res/shaders/attacked.glsl")
+    self.attacked_shader = love.graphics.newShader(shader_src)
+end
+
+function player:init()
+    self.state = "idle"
+    self.facing_direction = "right"
     self.current_texture = self.idle_texture
     self.frame_count = 4
     self.frame_number = 0
@@ -38,8 +44,6 @@ function player:load()
     self.attacked_color_count = 0
     self.attacked_radian_value = 0.0
     self.can_increase_attacked_color_count = true
-    local shader_src = love.filesystem.read("res/shaders/attacked.glsl")
-    self.attacked_shader = love.graphics.newShader(shader_src)
     self.attacked_velocity = 0.0
     self.attacked_direction = 0
     self.health = 3

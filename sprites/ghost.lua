@@ -2,6 +2,10 @@ ghost = {}
 
 function ghost:load()
     self.texture = love.graphics.newImage("res/image/ghost.png")
+    self:init()
+end
+
+function ghost:init()
     self.frame_count = 4
     self.frame_number = 0
     self.frame_time = 0.100

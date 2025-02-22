@@ -12,15 +12,19 @@ function sound:load()
         love.audio.newSource("res/sound/2.mp3", "static"),
         love.audio.newSource("res/sound/1.mp3", "static"),
         love.audio.newSource("res/sound/go.mp3", "static"),
-        played = false,
-        timer = 0.0,
-        index = 1
     }
+    self:init()
     self.start_sound[1]:setPitch(1.1)
     self.start_sound[2]:setPitch(1.1)
     self.start_sound[3]:setPitch(1.1)
     self.start_sound[4]:setPitch(1.1)
     self.select = love.audio.newSource("res/sound/select.wav", "static")
+end
+
+function sound:init()
+    self.start_sound.played = false
+    self.start_sound.timer = 0.0
+    self.start_sound.index = 1
 end
 
 function sound:update(dt)

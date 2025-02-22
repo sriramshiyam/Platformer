@@ -2,6 +2,10 @@ fireballs = {}
 
 function fireballs:load()
     self.texture = love.graphics.newImage("res/image/fireball.png")
+    self:init()
+end
+
+function fireballs:init()
     self.spawn_timer = 1.0
     self.list = {}
 end

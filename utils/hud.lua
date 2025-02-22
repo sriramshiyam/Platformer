@@ -26,11 +26,15 @@ function hud:load()
         index = 1
     }
     self.health_texture = love.graphics.newImage("res/image/health.png")
+    self:init()
+end
+
+function hud:init()
     self.health_frame_width = self.health_texture:getWidth()
     self.health_frame_height = self.health_texture:getHeight() / 3
     self.health_frame_quad = love.graphics.newQuad(0, 0, self.health_frame_width, self.health_frame_height,
         self.health_texture:getWidth(), self.health_texture:getHeight())
-    self.previous_health = -1
+    self.previous_health = 3
     self.score_timer = 0.0
     self.formated_timer = ""
 end
@@ -41,7 +45,7 @@ function hud:update(dt)
         self.formated_timer = string.format("%.2f", self.score_timer)
     end
     self.timer.index = sound.start_sound.index
-    if player.health > 0 and self.previous_health ~= player.health then
+    if self.previous_health ~= player.health then
         self.previous_health = player.health
         self.health_frame_quad:setViewport(0, self.health_frame_height * (3 - player.health), self.health_frame_width,
             self.health_frame_height);
